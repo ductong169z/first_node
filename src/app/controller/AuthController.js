@@ -40,7 +40,6 @@ class AuthController {
                     message: "User Not found.",
                 });
             }
-            console.log(user.id)
 
             //comparing passwords
             var passwordIsValid = bcrypt.compareSync(

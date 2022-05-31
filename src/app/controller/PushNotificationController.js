@@ -3,7 +3,7 @@ const { use } = require("../../routes/auth");
 
 class PushNotificationController {
     sendToDevices(req, res) {
-        const serviceAccount = require("../../../serviceAccountKey.json");
+        const serviceAccount = require("../../../uploads/serviceAccountKey.json");
         admin.initializeApp({
             credential: admin.credential.cert(serviceAccount),
             databaseURL: "https://hiringcar-56ca7-default-rtdb.asia-southeast1.firebasedatabase.app",
