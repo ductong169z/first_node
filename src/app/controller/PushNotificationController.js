@@ -37,6 +37,7 @@ class PushNotificationController {
                 .messaging()
                 .sendToDevice(registrationToken, payload, options)
                 .then(function(response) {
+                    admin.auth().app.delete()
                     res.status(200).json(response)
                     return new Promise();
                 })
