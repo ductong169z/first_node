@@ -2,16 +2,19 @@ const Server = require("../models/Server");
 const path = require("path");
 class ServerController {
     list(req, res) {
+        // #swagger.tags = ['Server']
+        // #swagger.description = 'Endpoint para obter um usuário.'
         const queryName = req.query.name;
-        Server.find(queryName ? { name: queryName } : {}).then((server) => {
+        Server.find(queryName ? { name: queryName } : {}).then((servers) => {
             res.status(200).send({
-                server: server,
+                data: servers,
                 message: "Successfull",
             });
         });
     }
     create(req, res) {
-        const name = req.body.name;
+        // #swagger.tags = ['Server']
+        // #swagger.description = 'Endpoint para obter um usuário.'
         try {
             if (!req.files) {
                 res.send({
@@ -21,6 +24,7 @@ class ServerController {
             } else {
                 //Use the name of the input field (i.e. "avatar") to retrieve the uploaded file
                 let configFile = req.files.configFile;
+                const name = req.body.name;
                 const fileName = name + Math.random() + configFile.name;
                 var uploadPath = path.resolve(
                     __dirname,
@@ -46,7 +50,7 @@ class ServerController {
                     } else {
                         res.status(200).send({
                             message: "Create server successfully",
-                            server: server,
+                            data: server,
                         });
                     }
                 });
@@ -56,7 +60,27 @@ class ServerController {
             res.status(500).send(err);
         }
     }
+    get(req, res) {
+        // #swagger.tags = ['Server']
+        // #swagger.description = 'Endpoint para obter um usuário.'
+        const id = req.params.id;
+        Server.findById(id, function(err, server) {
+            if (err) {
+                res.status(500).send({
+                    message: err,
+                });
+                return;
+            } else {
+                res.status(200).send({
+                    message: "Successfully",
+                    data: server,
+                });
+            }
+        });
+    }
     update(req, res) {
+        // #swagger.tags = ['Server']
+        // #swagger.description = 'Endpoint para obter um usuário.'
         const id = req.body.id;
         const name = req.body.name;
         try {
@@ -85,7 +109,7 @@ class ServerController {
                         name: name,
                         configFile: fileName,
                     }, { new: true },
-                    function(err, docs) {
+                    function(err, server) {
                         if (err) {
                             res.status(500).send({
                                 message: err,
@@ -94,7 +118,7 @@ class ServerController {
                         } else {
                             res.status(200).send({
                                 message: "Update server successfully",
-                                server: docs,
+                                data: server,
                             });
                         }
                     }
@@ -105,6 +129,8 @@ class ServerController {
         }
     }
     delete(req, res) {
+        // #swagger.tags = ['Server']
+        // #swagger.description = 'Endpoint para obter um usuário.'
         const id = req.body.id;
         Server.findByIdAndDelete(id, function(err) {
             if (err) {

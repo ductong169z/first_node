@@ -10,7 +10,6 @@ const db = require("./config/db");
 const bodyParser = require('body-parser');
 
 
-
 db.connect();
 app.use(morgan("combined"));
 app.use(fileUpload({

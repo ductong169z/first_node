@@ -26,6 +26,7 @@ class AuthController {
     };
 
     signin = (req, res) => {
+        console.log(req.body)
         User.findOne({
             email: req.body.email,
         }).exec((err, user) => {

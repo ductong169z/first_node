@@ -1,40 +1,52 @@
 const admin = require("firebase-admin");
 const { use } = require("../../routes/auth");
+const Server = require("../models/Server");
+const axios = require('axios').default;
 
 class PushNotificationController {
-    sendToDevices(req, res) {
-        const serviceAccount = require("../../../uploads/serviceAccountKey.json");
-        admin.initializeApp({
-            credential: admin.credential.cert(serviceAccount),
-            databaseURL: "https://hiringcar-56ca7-default-rtdb.asia-southeast1.firebasedatabase.app",
-        });
-        // This registration token comes from the client FCM SDKs.
-        const registrationToken =
-            "d7E7I4yENXUvZKouaDf6XS:APA91bF5OmfJpzx8t9360FrEA8y5I5fROxwg0Xr0ePx_RUViIAxxKsueGswC4ZbottAxXuD7gpYbBOtln1IUOklL3Y2ebR68_rDS0SkwPFqDS3Dgtms4A9i0By5wcPe3stHXpfKh4Gnn";
+    async sendToDevices(req, res) {
+        let nameServer = req.body.name;
+        let listTokenUrl = req.body.url;
+        const tokens = await axios.get(listTokenUrl)
 
-        var payload = {
-            notification: {
-                title: "This is a Notification",
-                body: "This is the body of the notification message.",
-            },
-        };
-
-        var options = {
-            priority: "high",
-            timeToLive: 60 * 60 * 24,
-        };
-        admin
-            .messaging()
-            .sendToDevice(registrationToken, payload, options)
-            .then(function(response) {
-                res.send(response);
-                return new Promise();
-            })
-            .catch(function(error) {
-                //console.log("Error sending message:", error);
-                res.send(error);
-                return new Promise();
+        let data = Server.findOne({ name: nameServer }, function(err, server) {
+            let fileName = server.configFile;
+            let dbUrl = server.dbUrl;
+            const serviceAccount = require("../../../uploads/" + fileName);
+            admin.initializeApp({
+                credential: admin.credential.cert(serviceAccount),
+                databaseURL: dbUrl,
             });
+
+            // This registration token comes from the client FCM SDKs.
+            const registrationToken = tokens.data.data
+
+
+            var payload = {
+                notification: {
+                    title: req.body.title,
+                    body: req.body.msg,
+                },
+            };
+
+            var options = {
+                priority: "high",
+                timeToLive: 60 * 60 * 24,
+            };
+            admin
+                .messaging()
+                .sendToDevice(registrationToken, payload, options)
+                .then(function(response) {
+                    res.status(200).json(response)
+                    return new Promise();
+                })
+                .catch(function(error) {
+                    // //console.log("Error sending message:", error);
+                    // res.status(409).json(error)
+                    // return new Promise();
+                });
+        })
+
     }
 }
 module.exports = new PushNotificationController();
