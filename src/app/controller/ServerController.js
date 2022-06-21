@@ -25,6 +25,7 @@ class ServerController {
                 //Use the name of the input field (i.e. "avatar") to retrieve the uploaded file
                 let configFile = req.files.configFile;
                 const name = req.body.name;
+                const dbUrl = req.body.dbUrl
                 const fileName = name + Math.random() + configFile.name;
                 var uploadPath = path.resolve(
                     __dirname,
@@ -40,6 +41,7 @@ class ServerController {
                 const server = new Server({
                     name: name,
                     configFile: fileName,
+                    dbUrl: dbUrl
                 });
                 server.save((err, server) => {
                     if (err) {
@@ -83,6 +85,8 @@ class ServerController {
         // #swagger.description = 'Endpoint para obter um usuário.'
         const id = req.body.id;
         const name = req.body.name;
+        const dbUrl = req.body.dbUrl
+
         try {
             if (!req.files) {
                 res.send({
@@ -97,7 +101,6 @@ class ServerController {
                     __dirname,
                     "../../../uploads/" + fileName
                 );
-                console.log(uploadPath);
                 //Use the mv() method to place the file in upload directory (i.e. "uploads")
                 configFile.mv(uploadPath, (err) => {
                     if (err) {
@@ -108,6 +111,7 @@ class ServerController {
                     id, {
                         name: name,
                         configFile: fileName,
+                        dbUrl: dbUrl
                     }, { new: true },
                     function(err, server) {
                         if (err) {
